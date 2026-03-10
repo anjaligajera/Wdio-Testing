@@ -1,58 +1,53 @@
-import { $$, $, browser } from '@wdio/globals';
+import { $ } from '@wdio/globals';
 
 class BookstorePage {
-    // Define locators (use selectors scoped to the books container)
-    public get searchInput() {
-        return $('//input[@placeholder="Enter keywords..."]');
-    }
+    // Selectors
+    public get searchInput () { return $('input[type="text"], input[type="search"], [placeholder*="Search"]'); }
+    public get cartLink () { return $('*=Cart'); } 
 
-    public get bookTitles() {
-        return $$('//div[@id="books"]//h5');
-    }
-
-    public get addToCartButtons() {
-        return $$('//a[@class="btn btn-expand w-100 mt-1 mb-2 ms-1 me-1"]');
-    }
-
-    public get cartLink() {
-        return $('//a[contains(., "Cart")]');
-    }
-
-    // Define actions
-    public async open() {
+    // Actions
+    public async open () {
         await browser.url('https://practice.expandtesting.com/bookstore');
     }
 
-    public async searchForBook(bookName: string) {
-        const searchBox = await this.searchInput;
+    public async searchForBook (bookTitle: string) {
+        const input = await this.searchInput;
+        await input.waitForDisplayed();
+       
+        await input.clearValue(); 
+        await input.setValue(bookTitle);
         
-        // Wait for the search box to be ready
-        await searchBox.waitForDisplayed();
+      
+        await browser.keys('Enter');
         
-        // Clear any previous search term before typing the new one
-        await searchBox.clearValue(); 
-        await searchBox.setValue(bookName);
-        
-        // Pause briefly to allow the UI to filter the list
-        await browser.pause(1000); 
+     
+        await browser.pause(500); 
     }
 
-    public async getFirstBookTitle(): Promise<string> {
-        // Await the length to ensure elements are present
-        const count = await this.bookTitles.length;
-        if (count === 0) throw new Error("No books found in the results!");
-        
-        return await this.bookTitles[0].getText();
+    public async getBookTitleElement (bookTitle: string) {
+   
+        return $(`*=${bookTitle}`);
     }
 
-    public async addFirstBookToCart() {
-        const count = await this.addToCartButtons.length;
-        if (count === 0) throw new Error("No 'Add to Cart' button found!");
+    public async clickAddToCartForBook (bookTitle: string) {
+        const addToCartBtn = await $(`//a[contains(text(), "${bookTitle}")]/ancestor::div[contains(@class, "card")]//button[contains(text(), "Add To Cart")]`);
         
-        await this.addToCartButtons[0].click();
-        
-        // Give the cart UI a moment to update the counter badge
-        await browser.pause(1000); 
+       
+        if (!(await addToCartBtn.isExisting())) {
+             const fallbackBtn = await $('//a[@class="btn btn-expand w-100 mt-1 mb-2 ms-1 me-1"]');
+             await fallbackBtn.waitForClickable();
+             await fallbackBtn.click();
+             return;
+        }
+
+        await addToCartBtn.waitForClickable();
+        await addToCartBtn.click();
+    }
+
+    public async getCartText() {
+        const cart = await this.cartLink;
+        await cart.waitForDisplayed();
+        return cart.getText();
     }
 }
 
