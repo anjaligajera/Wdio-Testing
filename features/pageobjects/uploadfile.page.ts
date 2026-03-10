@@ -1,30 +1,23 @@
-import { $, browser } from '@wdio/globals'
+import { $ } from '@wdio/globals'
 
 class UploadPage {
-    // ---- Locators ----
-    public get inputFile() { return $('input[type="file"]'); }
-    public get btnUpload() { return $('button=Upload'); } // Finds the button containing the exact text 'Upload'
+    // Selectors
+    public get fileInput () { return $('input[type="file"]'); }
+    public get uploadButton () { return $('button[type="submit"], input[type="submit"], #fileSubmit'); }
     
-    // ---- Actions ----
-    public async open() {
+    // Actions
+    public async open () {
         await browser.url('https://practice.expandtesting.com/upload');
-        await browser.maximizeWindow();
     }
 
-    public async uploadFile(localFilePath: string) {
-        // 1. Upload the local file to the browser's context
-        const remoteFilePath = await browser.uploadFile(localFilePath);
-        
-        // 2. Make sure the input exists
-        await this.inputFile.waitForExist();
-        
-        // 3. Set the remote file path as the value of the file input
-        await this.inputFile.setValue(remoteFilePath);
+    public async uploadFile (filePath: string) {
+        // WebdriverIO provides an `uploadFile` method to safely push the file to the browser
+        const remoteFilePath = await browser.uploadFile(filePath);
+        await this.fileInput.setValue(remoteFilePath);
     }
 
-    public async clickUpload() {
-        await this.btnUpload.waitForClickable();
-        await this.btnUpload.click();
+    public async submit () {
+        await this.uploadButton.click();
     }
 }
 
