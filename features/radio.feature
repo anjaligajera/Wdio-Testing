@@ -13,6 +13,6 @@ Feature: Radio Buttons Functionality
     Then the "football" sport radio button should be selected
     And the "basketball" sport radio button should not be selected
     
-    # Testing disabled buttons (Black is typically disabled on this site)
+   
     When I attempt to select the "green" color radio button
     Then the "green" color radio button should be disabled
