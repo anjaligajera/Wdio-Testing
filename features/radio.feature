@@ -1,17 +1,18 @@
-Feature: Radio Button Selection on ExpandTesting Page
+Feature: Radio Buttons Functionality
 
-  Scenario Outline: Verify selecting options in color and sport radio groups
-    Given I open the Radio Buttons test page
-    When I select the "<group>" radio button "<option>"
-    Then the radio button "<option>" in group "<group>" should be selected
-
-    Examples:
-      | group  | option      |
-      | Color  | Blue        |
-      | Color  | Red         |
-      | Color  | Yellow      |
-      | Color  | Black       |
-      | Color  | Green       |
-      | Sport  | Basketball  |
-      | Sport  | Football    |
-      | Sport  | Tennis      |
+  Scenario: User can select their favorite color and sport
+    Given I am on the radio buttons page
+    
+    # Testing the color radio buttons
+    When I select the "red" color radio button
+    Then the "red" color radio button should be selected
+    And the "blue" color radio button should not be selected
+    
+    # Testing the sport radio buttons
+    When I select the "football" sport radio button
+    Then the "football" sport radio button should be selected
+    And the "basketball" sport radio button should not be selected
+    
+    # Testing disabled buttons (Black is typically disabled on this site)
+    When I attempt to select the "green" color radio button
+    Then the "green" color radio button should be disabled

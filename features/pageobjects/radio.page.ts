@@ -1,39 +1,38 @@
+import { $ } from '@wdio/globals';
+
 class RadioButtonsPage {
-
-    // Selectors for color radio buttons
-    get radioColorBlue() { return $('//input[@value="blue"]'); }
-    get radioColorRed() { return $('//input[@value="red"]'); }
-    get radioColorYellow() { return $('//input[@value="yellow"]'); }
-    get radioColorBlack() { return $('//input[@value="black"]'); }
-    get radioColorGreen() { return $('//input[@value="green"]'); }
-
-    // Selectors for sport radio buttons
-    get sportBasketball() { return $('//input[@value="basketball"]'); }
-    get sportFootball() { return $('//input[@value="football"]'); }
-    get sportTennis() { return $('//input[@value="tennis"]'); }
-
-    // Open the page
-    async open() {
+    // Actions
+    public async open () {
         await browser.url('https://practice.expandtesting.com/radio-buttons');
     }
 
-    // Select a color by value
-    async selectColor(color: string) {
-        await $(`input[value="${color}"]`).click();
+    /**
+     * Dynamically gets a color radio button based on its value
+     * @param colorName 'blue', 'red', 'yellow', 'black', 'green'
+     */
+    public async getColorRadioButton (colorName: string) {
+        // Find input radio element by ID or value
+        return $(`input[type="radio"][id="${colorName.toLowerCase()}"], input[type="radio"][value="${colorName.toLowerCase()}"]`);
     }
 
-    // Select a sport
-    async selectSport(sport: string) {
-        await $(`input[value="${sport}"]`).click();
+    /**
+     * Dynamically gets a sport radio button based on its value
+     * @param sportName 'basketball', 'football', 'tennis'
+     */
+    public async getSportRadioButton (sportName: string) {
+        return $(`input[type="radio"][id="${sportName.toLowerCase()}"], input[type="radio"][value="${sportName.toLowerCase()}"]`);
     }
 
-    // Check if selected
-    async isColorSelected(color: string) {
-        return await $(`input[value="${color}"]`).isSelected();
+    public async selectColor (colorName: string) {
+        const radioButton = await this.getColorRadioButton(colorName);
+        // Radio buttons are often hidden behind custom UI labels, clicking the parent/label might be necessary, 
+        // but standard `.click()` on the input or its surrounding wrapper usually works.
+        await radioButton.click();
     }
 
-    async isSportSelected(sport: string) {
-        return await $(`input[value="${sport}"]`).isSelected();
+    public async selectSport (sportName: string) {
+        const radioButton = await this.getSportRadioButton(sportName);
+        await radioButton.click();
     }
 }
 
